@@ -7,10 +7,10 @@ stages:
   - build
 
 yarn_test:
-  image: node:20-alpine
+  image: node:18-bullseye
   stage: test
   script:
-    - yarn install
+    - yarn install --ignore-engines
     - yarn test
 
 build_image:
