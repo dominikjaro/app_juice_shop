@@ -11,7 +11,7 @@ create_cache:
   image: node:18-bullseye
   stage: cache
   script:
-    - yarn install
+    - yarn install --ignore-engines
   cache:
     key:
       files:
