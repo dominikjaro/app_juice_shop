@@ -1,0 +1,25 @@
+variables:
+    IMAGE_NAME: dominikjaro/demo-app
+    IMAGE_TAG: juice-shop-1.0
+
+stages:
+  - test
+  - build
+
+yarn_test:
+  image: node:18-bullseye
+  stage: test
+  script:
+    - yarn install
+    - yarn test
+
+build_image:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+  script:
+    - docker build -t $IMAGE_NAME:IMAGE_TAG .
+    - docker push $IMAGE_NAME:IMAGE_TAG
