@@ -46,7 +46,7 @@ gitleaks:
     #We set it to empty so it should wait for the script execution
     entrypoint: [""]
   script:
-    - gitleak detect --verbose --source .
+    - gitleaks detect --verbose --source .
 
 build_image:
   stage: build
