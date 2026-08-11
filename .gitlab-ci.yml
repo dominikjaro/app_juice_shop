@@ -67,7 +67,7 @@ semgrep:
   variables: 
     SEMGREP_RULES: p/javascript
   script:
-    - sempgrep ci
+    - semgrep ci
   allow_failure: true
 
 build_image:
