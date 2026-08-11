@@ -50,7 +50,7 @@ gitleaks:
   #To filter out False Positives - it only gives WARNING
   allow_failure: true
 
-#SAS tool to scan the static app code for vulnerabilities 
+#SAS tool to scan the static app code for vulnerabilities
 # e.g. SQL/NoSQL injection, unsafe regex, cross-site scripting (XSS) and unsecure dependencies
 njsscan:
   stage: test
@@ -63,7 +63,7 @@ njsscan:
 
 semgrep:
   stage: test
-  image: sempgrep/semgrep
+  image: semgrep/semgrep
   variables: 
     SEMGREP_RULES: p/javascript
   script:
