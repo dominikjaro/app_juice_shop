@@ -46,9 +46,13 @@ gitleaks:
     #We set it to empty so it should wait for the script execution
     entrypoint: [""]
   script:
-    - gitleaks detect --verbose --source .
+    - gitleaks detect --verbose --source . -f json -r gitleaks.json
   #To filter out False Positives - it only gives WARNING
   allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - gitleaks.json
 
 #SAS tool to scan the static app code for vulnerabilities
 # e.g. SQL/NoSQL injection, unsafe regex, cross-site scripting (XSS) and unsecure dependencies
@@ -58,8 +62,12 @@ njsscan:
   before_script:
     - pip3 install --upgrade njsscan
   script:
-    - njsscan --exit-warning .
+    - njsscan --exit-warning . --sarif -o njsscan.sarif
   allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - njsscan.sarif
 
 semgrep:
   stage: test
@@ -67,8 +75,12 @@ semgrep:
   variables: 
     SEMGREP_RULES: p/javascript
   script:
-    - semgrep ci
+    - semgrep ci --output semgrep.json
   allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - semgrep.json
 
 build_image:
   stage: build
