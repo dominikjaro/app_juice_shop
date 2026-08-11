@@ -64,7 +64,8 @@ njsscan:
 semgrep:
   stage: test
   image: sempgrep/semgrep
-  variables: p/javascript
+  variables: 
+    SEMGREP_RULES: p/javascript
   script:
     - sempgrep ci
   allow_failure: true
