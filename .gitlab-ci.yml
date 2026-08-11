@@ -47,7 +47,16 @@ gitleaks:
     entrypoint: [""]
   script:
     - gitleaks detect --verbose --source .
+  #To filter out False Positives
   allow_failure: true
+
+njsscan:
+  stage: test
+  image: python
+  before_script:
+    - pip3 install --upgrade njsscan
+  script:
+    - njsscan .
 
 build_image:
   stage: build
