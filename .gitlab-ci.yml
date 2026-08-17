@@ -82,6 +82,13 @@ semgrep:
     paths:
       - semgrep.json
 
+upload_reports:
+  stage: test
+  image: python
+  script:
+    - python 3 upload-reports.py
+
+
 build_image:
   stage: build
   image: docker:24
