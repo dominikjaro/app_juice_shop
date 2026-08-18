@@ -7,11 +7,11 @@ headers = {
 url = 'https://demo.defectdojo.org/api/v2/import-scan/'
 
 data = {
-    'active': True
-    'verified': True
-    'engagement': 37
-    'scan_type': 'GitLeaks Scan'
-    'minimum_severity': 'Low'
+    'active': True,
+    'verified': True,
+    'engagement': 37,
+    'scan_type': 'GitLeaks Scan',
+    'minimum_severity': 'Low',
     'environment': 'Test'
 }
 
@@ -19,7 +19,7 @@ files = {
     'file': open('gitleaks.json', 'rb')
 }
 
-response = requests.post(url, headers=headers, data=data, files=file)
+response = requests.post(url, headers=headers, data=data, files=files)
 
 if response.status_code == 201
     print('Scan results imported successfully')
