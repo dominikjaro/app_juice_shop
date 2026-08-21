@@ -84,7 +84,7 @@ semgrep:
 
 retire:
   stage: test
-  imag: node:18-bullseye
+  image: node:18-bullseye
   cache:
     key:
       files:
