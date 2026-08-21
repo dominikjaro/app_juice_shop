@@ -5,7 +5,7 @@ file_name = sys.argv[1]
 scan_type = ""
 
 if file_name == "gitleaks.json":
-    scan_type = "GitLeaks Scan"
+    scan_type = "Gitleaks Scan"
 elif file_name == "njsscan.sarif":
     scan_type = "SARIF"
 elif file_name == "semgrep.json":
