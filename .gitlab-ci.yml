@@ -75,7 +75,7 @@ semgrep:
   variables: 
     SEMGREP_RULES: p/javascript
   script:
-    - semgrep ci --output semgrep.json
+    - semgrep ci --json --output semgrep.json
   allow_failure: true
   artifacts:
     when: always

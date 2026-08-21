@@ -1,0 +1,221 @@
+                             
+                             
+┌───────────────────────────┐
+│ 22 Blocking Code Findings │
+└───────────────────────────┘
+                                                
+    data/static/codefixes/dbSchemaChallenge_1.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+            5┆ models.sequelize.query("SELECT * FROM Products WHERE ((name LIKE '%"+criteria+"%' OR
+               description LIKE '%"+criteria+"%') AND deletedAt IS NULL) ORDER BY name")           
+                                                         
+    data/static/codefixes/unionSqlInjectionChallenge_1.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+            6┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+                                                         
+    data/static/codefixes/unionSqlInjectionChallenge_3.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           10┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`)           
+                     
+    lib/insecurity.ts
+    ❯❱ javascript.express.security.audit.express-jwt-not-revoked.express-jwt-not-revoked
+          ❰❰ Blocking ❱❱
+          No token revoking configured for `express-jwt`. A leaked token could still be used and unable to be
+          revoked. Consider using function as the `isRevoked` option.                                        
+          Details: https://sg.run/kXNo                                                                       
+                                                                                                             
+           53┆ exports.isAuthorized = () => expressJwt({ secret: publicKey })
+            ⋮┆----------------------------------------
+           54┆ exports.denyAll = () => expressJwt({ secret: '' + Math.random() })
+   
+    ❯❱ javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret
+          ❰❰ Blocking ❱❱
+          A hard-coded credential was detected. It is not recommended to store credentials in source-code, as
+          this risks secrets being leaked and used by either an internal or external malicious adversary. It 
+          is recommended to use environment variables to securely provide credentials or retrieve credentials
+          from a secure vault or HSM (Hardware Security Module).                                             
+          Details: https://sg.run/4xN9                                                                       
+                                                                                                             
+           55┆ exports.authorize = (user = {}) => jwt.sign(user, privateKey, { expiresInMinutes: 60 * 5,
+               algorithm: 'RS256' })                                                                    
+                         
+    routes/dataErasure.ts
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          ❰❰ Blocking ❱❱
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+           69┆ const filePath: string = path.resolve(req.body.layout).toLowerCase()
+                        
+    routes/fileServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          ❰❰ Blocking ❱❱
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           33┆ res.sendFile(path.resolve('ftp/', file))
+                       
+    routes/keyServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          ❰❰ Blocking ❱❱
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+   
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          ❰❰ Blocking ❱❱
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+           14┆ res.sendFile(path.resolve('encryptionkeys/', file))
+                           
+    routes/logfileServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          ❰❰ Blocking ❱❱
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('logs/', file))
+   
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          ❰❰ Blocking ❱❱
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+           14┆ res.sendFile(path.resolve('logs/', file))
+                   
+    routes/login.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           36┆ models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND
+               password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model:
+               UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge           
+               loginBenderChallenge loginJimChallenge                                                 
+                                   
+    routes/profileImageUrlUpload.ts
+    ❯❱ javascript.express.security.audit.express-ssrf.express-ssrf
+          ❰❰ Blocking ❱❱
+          The following request request.get() was found to be crafted from user-input `req` which can lead to 
+          Server-Side Request Forgery (SSRF) vulnerabilities. It is recommended where possible to not allow   
+          user-input to craft the base request, but to be treated as part of the path or query parameter. When
+          user-input is necessary to craft the request, it is recommeneded to follow OWASP best practices to  
+          prevent abuse.                                                                                      
+          Details: https://sg.run/0PNw                                                                        
+                                                                                                              
+           23┆ .get(url)
+                              
+    routes/quarantineServer.ts
+    ❯❱ javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+          ❰❰ Blocking ❱❱
+          The application processes user-input, this is passed to res.sendFile which can allow an attacker to
+          arbitrarily read files on the system through path traversal. It is recommended to perform input    
+          validation in addition to canonicalizing the path. This allows you to validate the path against the
+          intended directory it should be accessing.                                                         
+          Details: https://sg.run/7DJk                                                                       
+                                                                                                             
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+   
+    ❯❱ javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+          ❰❰ Blocking ❱❱
+          Possible writing outside of the destination, make sure that the target path is nested in the
+          intended destination                                                                        
+          Details: https://sg.run/weRn                                                                
+                                                                                                      
+           14┆ res.sendFile(path.resolve('ftp/quarantine/', file))
+                      
+    routes/redirect.ts
+    ❯❱ javascript.express.security.audit.express-open-redirect.express-open-redirect
+          ❰❰ Blocking ❱❱
+          The application redirects to a URL specified by user-supplied input `query` that is not validated. 
+          This could redirect users to malicious locations. Consider using an allow-list approach to validate
+          URLs, or warn users they are being redirected to a third-party website.                            
+          Details: https://sg.run/EpoP                                                                       
+                                                                                                             
+           19┆ res.redirect(toUrl as string)
+                    
+    routes/search.ts
+   ❯❯❱ javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
+          ❰❰ Blocking ❱❱
+          Detected a sequelize statement that is tainted by user-input. This could lead to SQL injection if   
+          the variable is user-controlled and is not properly sanitized. In order to prevent SQL injection, it
+          is recommended to use parameterized queries or prepared statements.                                 
+          Details: https://sg.run/gjoe                                                                        
+                                                                                                              
+           23┆ models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR   
+               description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-
+               snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge                        
+                         
+    routes/userProfile.ts
+    ❯❱ javascript.express.security.express-insecure-template-usage.express-insecure-template-usage
+          ❰❰ Blocking ❱❱
+          User data from `req` is being compiled into the template, which can lead to a Server Side Template
+          Injection (SSTI) vulnerability.                                                                   
+          Details: https://sg.run/b49v                                                                      
+                                                                                                            
+           56┆ const fn = pug.compile(template)
+             
+    server.ts
+    ❯❱ javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing
+          ❰❰ Blocking ❱❱
+          Directory listing/indexing is enabled, which may lead to disclosure of sensitive directories and 
+          files. It is recommended to disable directory listing unless it is a public resource. If you need
+          directory listing, ensure that sensitive files are inaccessible when querying the resource.      
+          Details: https://sg.run/DX2G                                                                     
+                                                                                                           
+          241┆ app.use('/ftp', serveIndexMiddleware, serveIndex('ftp', { icons: true })) // vuln-code-
+               snippet vuln-line directoryListingChallenge                                            
+            ⋮┆----------------------------------------
+          246┆ app.use('/encryptionkeys', serveIndexMiddleware, serveIndex('encryptionkeys', { icons:
+               true, view: 'details' }))                                                             
+            ⋮┆----------------------------------------
+          250┆ app.use('/support/logs', serveIndexMiddleware, serveIndex('logs', { icons: true, view:
+               'details' })) // vuln-code-snippet vuln-line accessLogDisclosureChallenge             
+                            
+  BLOCKING CODE RULES FIRED:
+    javascript.express.security.audit.express-check-directory-listing.express-check-directory-listing
+    javascript.express.security.audit.express-jwt-not-revoked.express-jwt-not-revoked
+    javascript.express.security.audit.express-open-redirect.express-open-redirect
+    javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+    javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+    javascript.express.security.audit.express-ssrf.express-ssrf
+    javascript.express.security.express-insecure-template-usage.express-insecure-template-usage
+    javascript.jsonwebtoken.security.jwt-hardcode.hardcoded-jwt-secret
+    javascript.sequelize.security.audit.sequelize-injection-express.express-sequelize-injection
