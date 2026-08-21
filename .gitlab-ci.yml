@@ -96,7 +96,7 @@ retire:
     policy: pull-push
   before_script:
     - npm instal -g retire
-  scirpt:
+  script:
     - retire --path . --outputformat json --outputpath retire.json
   allow_failure: true
   artifacts:
