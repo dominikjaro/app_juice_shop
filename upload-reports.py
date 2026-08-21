@@ -20,7 +20,7 @@ url = 'https://demo.defectdojo.org/api/v2/import-scan/'
 data = {
     'active': True,
     'verified': True,
-    'engagement': 37,
+    'engagement': 30,
     'scan_type': scan_type,
     'minimum_severity': 'Low',
     'environment': 'Test'
