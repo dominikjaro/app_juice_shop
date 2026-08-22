@@ -1,6 +1,9 @@
-variables:
-    IMAGE_NAME: dominikjaro/demo-app
-    IMAGE_TAG: juice-shop-1.0
+ariables:
+    AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+    AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
+    AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+    AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+    IMAGE_NAME: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
 stages:
   - cache
@@ -104,19 +107,18 @@ retire:
     paths:
       - retire.json
 
-upload_reports:
-  stage: test
-  image: python
-  needs: ["gitleaks", "njsscan", "semgrep", "retire"]
-  when: always
-  before_script:
-    - pip3 install requests
-  script:
-    - python3 upload-reports.py gitleaks.json
-    - python3 upload-reports.py njsscan.sarif
-    - python3 upload-reports.py semgrep.json
-    - python3 upload-reports.py retire.json
-
+# upload_reports:
+#   stage: test
+#   image: python
+#   needs: ["gitleaks", "njsscan", "semgrep", "retire"]
+#   when: always
+#   before_script:
+#     - pip3 install requests
+#   script:
+#     - python3 upload-reports.py gitleaks.json
+#     - python3 upload-reports.py njsscan.sarif
+#     - python3 upload-reports.py semgrep.json
+#     - python3 upload-reports.py retire.json
 
 build_image:
   stage: build
@@ -124,7 +126,10 @@ build_image:
   services:
     - docker:24-dind
   before_script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+    - apk --no-cache add python3 py3-pip
+    - pip3 install  --no-cache-dir awscli
+    - aws ecr get-login-password | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   script:
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
-    - docker push $IMAGE_NAME:$IMAGE_TAG
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA -t IMAGE_NAME:$CI_COMMIT_SHA:latest .
+    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
+    - docker push $IMAGE_NAME:latest
