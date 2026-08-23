@@ -141,7 +141,7 @@ deploy_image:
     - apt-get update -y && apt install openssh-client -y
     - eval $(ssh-agent -s) # Starts a background SSH Agent process and configures the terminal session to talk to it.
     - chmod 400 "$SSH_PRIVATE_KEY"
-    - echo""$SSH_PRIVATE_KEY" | ssh-add - # Loads the SSH private key to the active agent
+    - echo "$SSH_PRIVATE_KEY" | ssh-add - # Loads the SSH private key to the active agent
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
   script:
