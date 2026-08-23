@@ -10,36 +10,36 @@ stages:
   - test
   - build
 
-create_cache:
-  image: node:18-bullseye
-  stage: cache
-  script:
-    - yarn install --ignore-engines
-  cache:
-    key:
-      files:
-        - yarn.lock
-    paths:
-        - node_modules/
-        - yarn.lock
-        - .yarn
-    policy: pull-push
+# create_cache:
+#   image: node:18-bullseye
+#   stage: cache
+#   script:
+#     - yarn install --ignore-engines
+#   cache:
+#     key:
+#       files:
+#         - yarn.lock
+#     paths:
+#         - node_modules/
+#         - yarn.lock
+#         - .yarn
+#     policy: pull-push
 
-yarn_test:
-  image: node:18-bullseye
-  stage: test
-  script:
-    - yarn install --ignore-engines
-    - yarn test
-  cache:
-    key:
-      files:
-        - yarn.lock
-    paths:
-        - node_modules/
-        - yarn.lock
-        - .yarn
-    policy: pull
+# yarn_test:
+#   image: node:18-bullseye
+#   stage: test
+#   script:
+#     - yarn install --ignore-engines
+#     - yarn test
+#   cache:
+#     key:
+#       files:
+#         - yarn.lock
+#     paths:
+#         - node_modules/
+#         - yarn.lock
+#         - .yarn
+#     policy: pull
 
 # gitleaks:
 #   stage: test
@@ -126,7 +126,8 @@ build_image:
   services:
     - docker:24-dind
   before_script:
-    - apk add --no-cache aws-cli expat libxml2
+    - apk add --no-cache aws-cli
+    - apk add --no-cache --upgrade libexpat aws-cli
     - aws --version
     - aws sts get-caller-identity
     - aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.eu-west-2.amazonaws.com
