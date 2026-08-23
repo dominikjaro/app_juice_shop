@@ -123,7 +123,7 @@ build_image:
     - apk add --no-cache --upgrade libexpat aws-cli
     - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   script:
-    - ECR_REPO="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/app_juice_shop"
-    - docker build -t $ECR_REPO:$CI_COMMIT_SHA -t $ECR_REPO:latest .
-    - docker push $ECR_REPO:$CI_COMMIT_SHA
-    - docker push $ECR_REPO:latest
+    - IMAGE_NAME="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice_shop"
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA -t $IMAGE_NAME:latest .
+    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
+    - docker push $IMAGE_NAME:latest
