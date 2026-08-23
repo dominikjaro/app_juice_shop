@@ -1,9 +1,9 @@
-variables:
-    AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-    AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
-    #AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
-    AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-    IMAGE_NAME: $AWS_ACCOUNT_ID.dkr.ecr.eu-west-2.amazonaws.com
+# variables:
+#     AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+#     AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
+#     AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+#     AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+#     IMAGE_NAME: $AWS_ACCOUNT_ID.dkr.ecr.eu-west-2.amazonaws.com
 
 stages:
   - cache
@@ -130,8 +130,8 @@ build_image:
     - apk add --no-cache --upgrade libexpat aws-cli
     - aws --version
     - aws sts get-caller-identity
-    - aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.eu-west-2.amazonaws.com
+    - aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 387056640672.dkr.ecr.eu-west-2.amazonaws.com
   script:
-    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA -t IMAGE_NAME:$CI_COMMIT_SHA:latest .
-    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
-    - docker push $IMAGE_NAME:latest
+    - docker build -t 387056640672.dkr.ecr.eu-west-2.amazonaws.com:$CI_COMMIT_SHA -t 387056640672.dkr.ecr.eu-west-2.amazonaws.com:$CI_COMMIT_SHA:latest .
+    - docker push 387056640672.dkr.ecr.eu-west-2.amazonaws.com:$CI_COMMIT_SHA
+    - docker push 387056640672.dkr.ecr.eu-west-2.amazonaws.com:latest
