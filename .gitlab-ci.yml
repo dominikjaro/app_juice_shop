@@ -1,45 +1,38 @@
-variables:
-    #AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-    #AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
-    #AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
-    #AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-    IMAGE_NAME: $AWS_ACCOUNT_ID.dkr.ecr.eu-west-2.amazonaws.com
-
 stages:
   - cache
   - test
   - build
 
-# create_cache:
-#   image: node:18-bullseye
-#   stage: cache
-#   script:
-#     - yarn install --ignore-engines
-#   cache:
-#     key:
-#       files:
-#         - yarn.lock
-#     paths:
-#         - node_modules/
-#         - yarn.lock
-#         - .yarn
-#     policy: pull-push
+create_cache:
+  image: node:18-bullseye
+  stage: cache
+  script:
+    - yarn install --ignore-engines
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+        - node_modules/
+        - yarn.lock
+        - .yarn
+    policy: pull-push
 
-# yarn_test:
-#   image: node:18-bullseye
-#   stage: test
-#   script:
-#     - yarn install --ignore-engines
-#     - yarn test
-#   cache:
-#     key:
-#       files:
-#         - yarn.lock
-#     paths:
-#         - node_modules/
-#         - yarn.lock
-#         - .yarn
-#     policy: pull
+yarn_test:
+  image: node:18-bullseye
+  stage: test
+  script:
+    - yarn install --ignore-engines
+    - yarn test
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+        - node_modules/
+        - yarn.lock
+        - .yarn
+    policy: pull
 
 # gitleaks:
 #   stage: test
@@ -130,6 +123,7 @@ build_image:
     - apk add --no-cache --upgrade libexpat aws-cli
     - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   script:
-    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA -t $IMAGE_NAME:latest .
-    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
-    - docker push $IMAGE_NAME:latest
+    - ECR_REPO="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/app_juice_shop"
+    - docker build -t $ECR_REPO:$CI_COMMIT_SHA -t $ECR_REPO:latest .
+    - docker push $ECR_REPO:$CI_COMMIT_SHA
+    - docker push $ECR_REPO:latest
