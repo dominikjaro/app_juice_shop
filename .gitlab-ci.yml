@@ -1,7 +1,13 @@
+variables:
+  SERVER_IP: 18.130.126.204
+  SERVER_USER: ubuntu
+  SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
+
 stages:
   - cache
   - test
   - build
+  - deploy
 
 create_cache:
   image: node:18-bullseye
@@ -127,3 +133,18 @@ build_image:
     - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA -t $IMAGE_NAME:latest .
     - docker push $IMAGE_NAME:$CI_COMMIT_SHA
     - docker push $IMAGE_NAME:latest
+
+deploy_image:
+  stage: deploy
+  image: debian:bullseye-slim
+  before_script:
+    - apt-get update -y && apt install openssh-client -y
+    - eval $(ssh-agent -s) # Starts a background SSH Agent process and configures the terminal session to talk to it.
+    - chmod 400 "$SSH_PRIVATE_KEY"
+    - echo""$SSH_PRIVATE_KEY" | ssh-add - # Loads the SSH private key to the active agent
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - ssh -o StrictHostKeyChecking=no $SERVeR_USER@$SERVER_IP "docker pull $IMAGE_NAME:latest" # By setting -o StrictHostKeyChecking=no you I disable the "Are you sure you want to continue connecting (yes/no)?"
+    - ssh -o StrictHostKeyChecking=no $SERVeR_USER@$SERVER_IP "docker stop juice-shop || true && docker rm juice-shop || true" # || true forces the pipeline to ignore the failure error and keeps going in case the commmand before fails
+    - ssh -o StrictHostKeyChecking=no $SERVeR_USER@$SERVER_IP  "docker run -d --name juice-shop -p 3000:3000 $IMAGE_NAME:latest"
