@@ -3,6 +3,7 @@ variables:
   SERVER_USER: ubuntu
   SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
 
+
 stages:
   - cache
   - test
