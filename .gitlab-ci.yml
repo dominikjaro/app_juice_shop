@@ -57,8 +57,8 @@ gitleaks:
     paths:
       - gitleaks.json
 
-SAS tool to scan the static app code for vulnerabilities
-e.g. SQL/NoSQL injection, unsafe regex, cross-site scripting (XSS) and unsecure dependencies
+# SAS tool to scan the static app code for vulnerabilities
+# e.g. SQL/NoSQL injection, unsafe regex, cross-site scripting (XSS) and unsecure dependencies
 njsscan:
   stage: test
   image: python
