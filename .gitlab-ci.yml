@@ -1,5 +1,5 @@
 variables:
-  SERVER_IP: 13.135.173.90
+  APP_SERVER: 35.179.130.118
   SERVER_USER: ubuntu
 
 
@@ -132,6 +132,23 @@ build_image:
     - docker push $IMAGE_NAME:$CI_COMMIT_SHA
     - docker push $IMAGE_NAME:latest
 
+trivy:
+  stage: build
+  needs: ["build_image"]
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - apk --no-cache add curl python3 py3-pip
+    - pip3 install --no-cache-dir awscli
+    - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+  script:
+    - docker pull $IMAGE_NAME:$CI_COMMIT_SHA
+    - trivy image --severity HIGH,CRITICAL --exit-code 1 $IMAGE_NAME:$CI_COMMIT_SHA
+  allow_failure: true
+
+
 deploy_image:
   stage: deploy
   image: debian:bullseye-slim
@@ -144,6 +161,6 @@ deploy_image:
     - chmod 700 ~/.ssh
   script:
     - IMAGE_NAME="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop"
-    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $IMAGE_NAME:latest" # By setting -o StrictHostKeyChecking=no you I disable the "Are you sure you want to continue connecting (yes/no)?"
-    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker stop juice-shop || true && docker rm juice-shop || true" # || true forces the pipeline to ignore the failure error and keeps going in case the commmand before fails
-    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP  "docker run -d --name juice-shop -p 3000:3000 $IMAGE_NAME:latest"
+    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$APP_SERVER "docker pull $IMAGE_NAME:latest" # By setting -o StrictHostKeyChecking=no you I disable the "Are you sure you want to continue connecting (yes/no)?"
+    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$APP_SERVER "docker stop juice-shop || true && docker rm juice-shop || true" # || true forces the pipeline to ignore the failure error and keeps going in case the commmand before fails
+    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$APP_SERVER  "docker run -d --name juice-shop -p 3000:3000 $IMAGE_NAME:latest"
