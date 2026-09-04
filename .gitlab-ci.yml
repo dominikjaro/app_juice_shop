@@ -138,9 +138,9 @@ trivy:
     - trivy image -f json -o trivy.json --severity HIGH,CRITICAL --exit-code 1 $ECR_IMAGE
   allow_failure: true
   artifacts:
-  when: always
-  paths:
-    - trivy.json
+    when: always
+    paths:
+      - trivy.json
 
 upload_reports:
   stage: upload-reports
