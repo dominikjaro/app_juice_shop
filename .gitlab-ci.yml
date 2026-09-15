@@ -152,7 +152,8 @@ stages:
 
 deploy_image:
   stage: deploy
-  image: amazon/aws-cli
-  entrypoint: [""]
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]
   script:
     - aws ssm send-command --instance-ids "i-08598c5a75b45159a" --document-name "AWS-RunShellScript" --parameters 'commands=["echo HelloWorld"]'
