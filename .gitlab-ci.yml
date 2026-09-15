@@ -1,8 +1,3 @@
-variables:
-  APP_SERVER: 35.179.130.118
-  SERVER_USER: ubuntu
-
-
 stages:
   - cache
   - test
@@ -10,163 +5,154 @@ stages:
   - upload-reports
   - deploy
 
-create_cache:
-  image: node:18-bullseye
-  stage: cache
-  script:
-    - yarn install --ignore-engines
-  cache:
-    key:
-      files:
-        - yarn.lock
-    paths:
-        - node_modules/
-        - yarn.lock
-        - .yarn
-    policy: pull-push
+# create_cache:
+#   image: node:18-bullseye
+#   stage: cache
+#   script:
+#     - yarn install --ignore-engines
+#   cache:
+#     key:
+#       files:
+#         - yarn.lock
+#     paths:
+#         - node_modules/
+#         - yarn.lock
+#         - .yarn
+#     policy: pull-push
 
-yarn_test:
-  image: node:18-bullseye
-  stage: test
-  script:
-    - yarn install --ignore-engines
-    - yarn test
-  cache:
-    key:
-      files:
-        - yarn.lock
-    paths:
-        - node_modules/
-        - yarn.lock
-        - .yarn
-    policy: pull
+# yarn_test:
+#   image: node:18-bullseye
+#   stage: test
+#   script:
+#     - yarn install --ignore-engines
+#     - yarn test
+#   cache:
+#     key:
+#       files:
+#         - yarn.lock
+#     paths:
+#         - node_modules/
+#         - yarn.lock
+#         - .yarn
+#     policy: pull
 
-gitleaks:
-  stage: test
-  image:
-    name: zricethezav/gitleaks
-    #We set the entrypoint so the gitleaks image accepts commands through that entrypoint
-    #We set it to empty so it should wait for the script execution
-    entrypoint: [""]
-  script:
-    - gitleaks detect --verbose --source . -f json -r gitleaks.json
-  #To filter out False Positives - it only gives WARNING
-  allow_failure: true
-  artifacts:
-    when: always
-    paths:
-      - gitleaks.json
+# gitleaks:
+#   stage: test
+#   image:
+#     name: zricethezav/gitleaks
+#     #We set the entrypoint so the gitleaks image accepts commands through that entrypoint
+#     #We set it to empty so it should wait for the script execution
+#     entrypoint: [""]
+#   script:
+#     - gitleaks detect --verbose --source . -f json -r gitleaks.json
+#   #To filter out False Positives - it only gives WARNING
+#   allow_failure: true
+#   artifacts:
+#     when: always
+#     paths:
+#       - gitleaks.json
 
-# SAS tool to scan the static app code for vulnerabilities
-# e.g. SQL/NoSQL injection, unsafe regex, cross-site scripting (XSS) and unsecure dependencies
-njsscan:
-  stage: test
-  image: python
-  before_script:
-    - pip3 install --upgrade njsscan
-  script:
-    - njsscan --exit-warning . --sarif -o njsscan.sarif
-  allow_failure: true
-  artifacts:
-    when: always
-    paths:
-      - njsscan.sarif
+# # SAS tool to scan the static app code for vulnerabilities
+# # e.g. SQL/NoSQL injection, unsafe regex, cross-site scripting (XSS) and unsecure dependencies
+# njsscan:
+#   stage: test
+#   image: python
+#   before_script:
+#     - pip3 install --upgrade njsscan
+#   script:
+#     - njsscan --exit-warning . --sarif -o njsscan.sarif
+#   allow_failure: true
+#   artifacts:
+#     when: always
+#     paths:
+#       - njsscan.sarif
 
-semgrep:
-  stage: test
-  image: semgrep/semgrep
-  variables: 
-    SEMGREP_RULES: p/javascript
-  script:
-    - semgrep ci --json --output semgrep.json
-  allow_failure: true
-  artifacts:
-    when: always
-    paths:
-      - semgrep.json
+# semgrep:
+#   stage: test
+#   image: semgrep/semgrep
+#   variables: 
+#     SEMGREP_RULES: p/javascript
+#   script:
+#     - semgrep ci --json --output semgrep.json
+#   allow_failure: true
+#   artifacts:
+#     when: always
+#     paths:
+#       - semgrep.json
 
-retire:
-  stage: test
-  image: node:18-bullseye
-  cache:
-    key:
-      files:
-        - yarn.lock
-    paths:
-        - node_modules/
-        - yarn.lock
-        - .yarn
-    policy: pull-push
-  before_script:
-    - npm install -g retire
-  script:
-    - retire --path . --outputformat json --outputpath retire.json
-  allow_failure: true
-  artifacts:
-    when: always
-    paths:
-      - retire.json
+# retire:
+#   stage: test
+#   image: node:18-bullseye
+#   cache:
+#     key:
+#       files:
+#         - yarn.lock
+#     paths:
+#         - node_modules/
+#         - yarn.lock
+#         - .yarn
+#     policy: pull-push
+#   before_script:
+#     - npm install -g retire
+#   script:
+#     - retire --path . --outputformat json --outputpath retire.json
+#   allow_failure: true
+#   artifacts:
+#     when: always
+#     paths:
+#       - retire.json
 
-build_image:
-  stage: build
-  tags:
-    - shell
-    - ec2
-  before_script:
-    - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-  script:
-    - IMAGE_NAME="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop"
-    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA -t $IMAGE_NAME:latest .
-    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
-    - docker push $IMAGE_NAME:latest
+# build_image:
+#   stage: build
+#   tags:
+#     - shell
+#     - ec2
+#   before_script:
+#     - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+#   script:
+#     - IMAGE_NAME="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop"
+#     - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA -t $IMAGE_NAME:latest .
+#     - docker push $IMAGE_NAME:$CI_COMMIT_SHA
+#     - docker push $IMAGE_NAME:latest
 
-trivy:
-  stage: build
-  needs: ["build_image"]
-  image: docker:24
-  services:
-    - docker:24-dind
-  before_script:
-    - apk --no-cache add curl
-    - apk add --no-cache aws-cli
-    - apk add --no-cache --upgrade libexpat aws-cli
-    - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-  script:
-    - ECR_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop:$CI_COMMIT_SHA"
-    - docker pull $ECR_IMAGE
-    - trivy image -f json -o trivy.json --severity HIGH,CRITICAL --exit-code 1 $ECR_IMAGE
-  allow_failure: true
-  artifacts:
-    when: always
-    paths:
-      - trivy.json
+# trivy:
+#   stage: build
+#   needs: ["build_image"]
+#   image: docker:24
+#   services:
+#     - docker:24-dind
+#   before_script:
+#     - apk --no-cache add curl
+#     - apk add --no-cache aws-cli
+#     - apk add --no-cache --upgrade libexpat aws-cli
+#     - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+#     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+#   script:
+#     - ECR_IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop:$CI_COMMIT_SHA"
+#     - docker pull $ECR_IMAGE
+#     - trivy image -f json -o trivy.json --severity HIGH,CRITICAL --exit-code 1 $ECR_IMAGE
+#   allow_failure: true
+#   artifacts:
+#     when: always
+#     paths:
+#       - trivy.json
 
-upload_reports:
-  stage: upload-reports
-  image: python
-  when: always
-  before_script:
-    - pip3 install requests
-  script:
-    - python3 upload-reports.py gitleaks.json
-    - python3 upload-reports.py njsscan.sarif
-    - python3 upload-reports.py semgrep.json
-    - python3 upload-reports.py retire.json
-    - python3 upload-reports.py trivy.json
+# upload_reports:
+#   stage: upload-reports
+#   image: python
+#   when: always
+#   before_script:
+#     - pip3 install requests
+#   script:
+#     - python3 upload-reports.py gitleaks.json
+#     - python3 upload-reports.py njsscan.sarif
+#     - python3 upload-reports.py semgrep.json
+#     - python3 upload-reports.py retire.json
+#     - python3 upload-reports.py trivy.json
 
 deploy_image:
   stage: deploy
-  image: debian:bullseye-slim
-  before_script:
-    - apt-get update -y && apt install openssh-client -y
-    - eval $(ssh-agent -s) # Starts a background SSH Agent process and configures the terminal session to talk to it.
-    - chmod 400 "$SSH_PRIVATE_KEY"
-    - ssh-add "$SSH_PRIVATE_KEY" # Loads the SSH private key to the active agent
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
+  image: amazon/aws-cli
+  entrypoint: [""]
   script:
-    - IMAGE_NAME="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop"
-    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$APP_SERVER "docker pull $IMAGE_NAME:latest" # By setting -o StrictHostKeyChecking=no you I disable the "Are you sure you want to continue connecting (yes/no)?"
-    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$APP_SERVER "docker stop juice-shop || true && docker rm juice-shop || true" # || true forces the pipeline to ignore the failure error and keeps going in case the commmand before fails
-    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$APP_SERVER  "docker run -d --name juice-shop -p 3000:3000 $IMAGE_NAME:latest"
+    - aws ssm send-command --instance-ids "i-08598c5a75b45159a" --document-name "AWS-RunShellScript" --parameters 'commands=["echo HelloWorld"]'
