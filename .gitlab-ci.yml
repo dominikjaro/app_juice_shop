@@ -1,3 +1,6 @@
+variables:
+  IMAGE_NAME: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop"
+
 stages:
   - cache
   - test
