@@ -6,7 +6,8 @@ stages:
   - test
   - build
   - upload-reports
-  - deploy
+  - deploy-test
+  - deploy-prod
 
 # create_cache:
 #   image: node:18-bullseye
@@ -152,8 +153,8 @@ build_image:
     - docker push $IMAGE_NAME:$CI_COMMIT_SHA
     - docker push $IMAGE_NAME:latest
 
-deploy_image:
-  stage: deploy
+deploy_test:
+  stage: deploy-test
   tags:
     - shell
     - ec2
@@ -165,3 +166,23 @@ deploy_image:
     - sleep 60
     - aws ssm get-command-invocation --command-id="$COMMAND_ID" --instance-id "i-08598c5a75b45159a"
  
+zap:
+  stage: deploy-test
+  image: zaproxy/zap-stable
+  needs: ["deploy_test"]
+  variables:
+    ZAP_TARGET: "http://18.135.15.105:3000"
+  before_script:
+    - mkdir -p /zap/wrk
+  script:
+    - zap-baseline.py -t $ZAP_TARGET -g gen.conf -I -x baseline.xml
+  artifacts:
+    when: always
+    paths:
+      - baseline.xml
+
+deploy_prod:
+  stage: deploy-prod
+  script:
+    - echo "Deploying to production environment"
+  when: manual #Needs to trigger manually.
