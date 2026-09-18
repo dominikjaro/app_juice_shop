@@ -1,5 +1,7 @@
 variables:
   IMAGE_NAME: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop"
+  AWS_ACCOUNT_ID: "$AWS_ACCOUNT_ID"
+  AWS_DEFAULT_REGION: "$AWS_DEFAULT_REGION"
 
 stages:
   - cache
@@ -159,7 +161,7 @@ deploy_image:
     - ec2
   script:
     - LOG_IN_CMD="export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION; export AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID; aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
-    - COMMANDS_TO_EXECUTE="docker pull $IMAGE_NAME:latest && (docker stop juice-shop || true) && (docker rm juice-shop || true) && docker run -d --name juice-shop -p 3000:3000 $IMAGE_NAME:latest"
+    - COMMANDS_TO_EXECUTE="docker system prune -f && docker pull $IMAGE_NAME:latest && (docker stop juice-shop || true) && (docker rm juice-shop || true) && docker run -d --name juice-shop -p 3000:3000 $IMAGE_NAME:latest"
     - FULL_SCRIPT="$LOG_IN_CMD; $COMMANDS_TO_EXECUTE"
     - COMMAND_ID=$(aws ssm send-command --instance-ids "i-08598c5a75b45159a" --document-name "AWS-RunShellScript" --parameters commands="$FULL_SCRIPT" --query "Command.CommandId" --output text)
     - env | grep AWS
