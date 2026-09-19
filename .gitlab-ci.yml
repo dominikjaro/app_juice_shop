@@ -1,6 +1,6 @@
 variables:
   IMAGE_NAME: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/juice-shop"
-  $APP_URL: "13.40.42.62"
+  APP_URL: "13.40.42.62"
 
 stages:
   - cache
